@@ -1,0 +1,37 @@
+name: Growth Sync (Google Docs -> GitHub)
+
+on:
+  # Permite rodar manualmente clicando em um botão na aba Actions
+  workflow_dispatch:
+
+  # Roda automaticamente todos os dias às 09:00 (horário UTC)
+  schedule:
+    - cron: '0 9 * * *'
+
+jobs:
+  sync_tasks:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Baixa o código do seu repositório para a máquina virtual
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      # 2. Instala o Node.js na versão mais recente (LTS)
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 3. Instala as bibliotecas listadas no seu package.json
+      - name: Instalar dependências
+        run: npm install
+
+      # 4. Executa o script principal de sincronização
+      - name: Rodar script de automação
+        run: node index.js
+        env:
+          # Aqui o robô pega os segredos salvos no GitHub e entrega ao código
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+          GOOGLE_FOLDER_ID: ${{ secrets.GOOGLE_FOLDER_ID }}
